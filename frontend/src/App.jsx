@@ -6,8 +6,10 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [editId, setEditId] = useState(null);
 
+  const API = import.meta.env.VITE_API_URL;
+
   const fetchNotes = async () => {
-    const res = await fetch("http://localhost:5000/notes");
+    const res = await fetch(`${API}/notes`);
     const data = await res.json();
     setNotes(data);
   };
@@ -20,17 +22,22 @@ function App() {
     if (!text.trim()) return;
 
     if (editId === null) {
-      await fetch("http://localhost:5000/notes", {
+      await fetch(`${API}/notes`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
       });
     } else {
-      await fetch(`http://localhost:5000/notes/${editId}`, {
+      await fetch(`${API}/notes/${editId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
       });
+
       setEditId(null);
     }
 
@@ -39,15 +46,16 @@ function App() {
   };
 
   const deleteNote = async (id) => {
-    await fetch(`http://localhost:5000/notes/${id}`, {
-      method: "DELETE",
+    await fetch(`${API}/notes/${id}`, {
+      method: "DELETE"
     });
+
     fetchNotes();
   };
 
   const editNote = (note) => {
     setText(note.text);
-    setEditId(note.id);
+    setEditId(note._id);
   };
 
   return (
@@ -74,17 +82,20 @@ function App() {
             <p className="empty">No notes yet</p>
           ) : (
             notes.map((note) => (
-              <div className="noteCard" key={note.id}>
+              <div className="noteCard" key={note._id}>
                 <span>{note.text}</span>
 
                 <div className="btns">
-                  <button className="edit" onClick={() => editNote(note)}>
+                  <button
+                    className="edit"
+                    onClick={() => editNote(note)}
+                  >
                     Edit
                   </button>
 
                   <button
                     className="delete"
-                    onClick={() => deleteNote(note.id)}
+                    onClick={() => deleteNote(note._id)}
                   >
                     Delete
                   </button>
